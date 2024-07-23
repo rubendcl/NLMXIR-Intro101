@@ -1,0 +1,271 @@
+---
+title: "NLMIXR_Intro"
+author: "Renan Cabrera"
+date: "2023-07-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE, warning=FALSE}
+rm(list = ls())
+
+library(dplyr)
+library(ggplot2)
+library(ggforce)
+
+library(ggstance)
+
+library(tidyr)
+library(comprehenr)
+
+library(kableExtra)
+
+library(purrr)
+
+library(nlmixr2)
+```
+
+# Introduction
+This documents is an introduction of Non Linear Mixed Effects with the help of the R package NLMIXR2.
+This example is based on: 
+https://nlmixr2.org/articles/addingCovariances.html
+
+# Data
+The data corresponds to Phenobarbitol, which is automatically loaded with MLMIXR 
+```{r}
+#pheno_sd
+str(pheno_sd)
+```
+The columns are defined as
+
+* ID: Identification of individual. 
+* TIME: Time 
+* AMT:  Amount of drug dose.
+* WT:   Weight.  This is a covariate
+* APGR: Apgar score.  This is a covariate
+* DV:   Dependent variable observed. This is the measured concentration in blood plasma.
+* MDV:  Missing dependent variable. This is 1 whenever the row value is not an DV observation.
+        If MDV=0, DV must be used, otherwise DV must be ignored. 
+* EVID: EVID=0 for dependent variable observed. 
+        EVID=1 for dose record. The AMT column should be used.
+        
+The naming of the columns ID, TIME, AMT, DV, MDV and EVID follows the NONMEN convention. 
+More information can be found at: 
+
+* Bauer, Robert J. "NONMEM tutorial part I: description of commands and options, with simple examples of population analysis." CPT: pharmacometrics & systems pharmacology 8.8 (2019): 525-537.
+
+
+```{r}
+p <- ggplot( data= filter(pheno_sd,EVID==0),  
+             aes(x=TIME,y=DV, group=factor(ID), color=factor(ID) ))
+p <- p + geom_line() + geom_point()
+p <- p + theme_bw()
+p <- p + xlab("Time (h)") + ylab("Concentration (mg/L)")
+p #+ facet_wrap(WT~.)
+```
+The superposition of doses as vertical black lines on concentration profiles
+```{r, fig.height=10}
+p <- ggplot( )
+p <- p +  geom_segment( 
+  data= filter(pheno_sd,EVID==1),
+  aes(x=TIME, xend=TIME, y=0,yend=AMT), size=1 )
+
+p <- p +  geom_point(
+  data= filter(pheno_sd,EVID==0),
+  aes(x=TIME, y=DV, color=factor(ID) ), size=3 )
+
+p <- p + theme_bw()
+p <- p + xlab("Time (h)") + ylab("Concentration (mg/L)")
+p <- p + theme(legend.position="none")
+p + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1)
+```
+
+
+# Model 
+
+The differential equation for the amount is
+$$ \frac{A_1}{dt } = - k_e A_1 $$
+The concentration is 
+$$C_p = \frac{A_1}{V}$$
+
+The clearance is defined from 
+$$k_e = \frac{CL}{V}$$
+It is usual to parametrize the model in terms of clearance and volume instead of $k_e$.
+
+The actual fitting parametrization is carried out in term of so called typical values $LogTVCL$ and $LogTVV$:
+
+$$
+\begin{align}
+  CL =& \exp( LogTVCL + \eta_{CL} )  \\
+  V  =& \exp( LogTVV  + \eta_{V} ) 
+\end{align}
+$$
+where $\eta_{CL}$ and $\eta_{V}$ are random variables obeying normal distributions with a covariance matrix $\Omega$ (mean zero). The components of $\Omega$ are then additional fit parameters. The matrix $\Omega$ and the variables $\eta$ are responsible to explain random inter-individual variability.
+
+$$(\eta_{CL} , \eta_{V}) \approx   N(0, \Omega)  $$
+If $\Omega$ is a diagonal matrix, the inter-individual variabilities are independent. Otherwise, they have some correlation.
+
+
+
+The residual error model provides the final random variability on the predicted concentration. The residual error model
+in this example is 
+$$C_{obs} = C_p + \varepsilon$$,
+where $\varepsilon$ is a normal random variable (specified by $add.err=\sigma^2$).
+$$ \varepsilon \approx N(0, \sigma^2) $$
+
+```{r}
+pheno <- function() {
+  ini({
+    LogTVCL <- log(0.008) # typical value of log clearance with initial value CL=0.008
+    LogTVV <-  log(0.6)   # typical value of log volume with initial value V=0.6 
+    ## var(eta.cl)
+    eta.cl + eta.v ~ c(1, 
+                       0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
+  })
+  model({
+    cl <- exp(LogTVCL + eta.cl) # individual value of clearance
+    v <- exp(LogTVV + eta.v)    # individual value of volume
+    ke <- cl / v            # elimination rate constant
+    d/dt(A1) = - ke * A1    # model differential equation
+    cp = A1 / v             # concentration in plasma
+    cp ~ add(add.err)       # define residual error model
+  })
+}
+```
+
+Fit with the SAEM method (stochastic optimization)
+```{r, message=FALSE}
+fit <- nlmixr(pheno, pheno_sd, "saem",
+              control=list(print=0), 
+              table=list(cwres=TRUE, npde=TRUE))
+```
+
+```{r}
+str(fit)
+```
+
+The final objective function and associated values
+```{r}
+fit$objDf         %>% kable %>% kable_styling()
+```
+
+The fitted parameters are
+```{r}
+fit$parFixedDf %>% kable %>% kable_styling()
+```
+
+where Back transformed is the exponential of the actual estimations in the log scale.
+
+The estimated $\Omega$ covariance matrix is
+```{r}
+as.data.frame( fit$omega ) %>% kable %>% kable_styling()
+```
+
+Additionally, the output contains time series
+```{r}
+fit.time.series <- as.data.frame(fit)
+```
+
+This time series contains as many rows as many concentration observations. 
+```{r}
+nrow(fit.time.series)
+```
+
+```{r}
+str(fit.time.series)
+```
+The definition of some columns:
+
+* PRED: The concentration without inter-individual variability $\eta=0$ also known as population concentration prediction.
+
+* IPRED: The concentration with inter-individual variability.
+
+
+
+The superposition of doses as vertical black lines on concentration profiles
+```{r, fig.height=10,fig.width=8}
+p <- ggplot( )
+p <- p +  geom_segment( 
+  data= filter(pheno_sd,EVID==1),
+  aes(x=TIME, xend=TIME, y=0,yend=AMT), size=1 )
+
+p <- p +  geom_point(
+  data= filter(pheno_sd,EVID==0),
+  aes(x=TIME, y=DV ), size=3, color="#7CAE00" )
+
+p <- p + geom_line(
+    data=fit.time.series,
+    aes(x=TIME,y=PRED  ), color="blue", size=1 )
+
+p <- p + geom_line(
+    data=fit.time.series,
+    aes(x=TIME,y=IPRED  ), color="red" )
+
+
+p <- p + theme_bw()
+p <- p + xlab("Time (h)") + ylab("Concentration (mg/L)")
+p <- p + theme(legend.position="none")
+p <- p + labs(caption = "Red: Individual predictions \n Blue: Population predictions") 
+p + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1)
+```
+
+A time series with higher resolution in time can be calculated as
+
+```{r}
+fit.time.series.aug <- mutate( as.data.frame( augPred( fit )  ), ID=id )%>% select(-id)
+nrow(fit.time.series.aug)
+```
+```{r}
+str(fit.time.series.aug)
+select(fit.time.series.aug,ind)%>% distinct()
+#select(fit.time.series.aug,Endpoint)%>% distinct()
+
+```
+
+
+```{r}
+#plot(augPred(fit))
+```
+
+```{r, fig.height=10,fig.width=8}
+p <- ggplot( )
+
+p <- p +  geom_segment( 
+  data= filter(pheno_sd,EVID==1),
+  aes(x=TIME, xend=TIME, y=0,yend=AMT), size=1 )
+
+p <- p +  geom_point(
+  data= filter(pheno_sd,EVID==0),
+  aes(x=TIME, y=DV ), size=3, color="#7CAE00" )
+
+p <- p + geom_line(
+    data = filter( fit.time.series.aug, ind=="Individual") ,
+    aes(x=time,y=values  ), color="red", size=0.5 )
+
+p <- p + geom_line(
+    data = filter( fit.time.series.aug, ind=="Population") ,
+    aes(x=time,y=values  ), color="blue", size=0.5 )
+
+#p <- p + scale_x_continuous(limits=c(0,200))
+
+p <- p + theme_bw()
+p <- p + xlab("Time (h)") + ylab("Concentration (mg/L)")
+p <- p + theme(legend.position="none")
+p <- p + labs(caption = "Red: Individual predictions \n Blue: Population predictions") 
+p + facet_wrap_paginate(ID~., ncol=1, nrow=4, page=1, scales = "free")
+```
+
+# Bibliography
+
+* Nguyen, T. H. T., et al. "Model evaluation of continuous data pharmacometric models: metrics and graphics. CPT Pharmacometrics Syst Pharmacol 6: 87–109." (2017).
+
+* Bauer, Robert J. "NONMEM tutorial part I: description of commands and options, with simple examples of population analysis." CPT: pharmacometrics & systems pharmacology 8.8 (2019): 525-537.
+
+* Wang, Yaning. "Derivation of various NONMEM estimation methods." Journal of Pharmacokinetics and pharmacodynamics 34 (2007): 575-593.
+
+
