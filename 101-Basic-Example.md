@@ -9,15 +9,86 @@ Basic Example
 
 ``` r
 library(nlmixr2)
+library(ggplot2)
+library(dplyr) # For 
 ```
+
+## Data
+
+Multiple dose theophylline PK data
+
+This data set is the day 1 concentrations of the theophylline data. A
+data frame with 144 rows by 7 columns
+
+ID: Subject ID TIME: Time (hrs) DV: Dependent Variable, theophylline
+concentration AMT: Dose Amount/kg EVID: rxode2/nlmixr2 event ID (not
+NONMEM’s) CMT: nCompartment Number WT: Weight (kg)
+
+``` r
+head(theo_sd)
+```
+
+    ##   ID TIME    DV     AMT EVID CMT   WT
+    ## 1  1 0.00  0.00 319.992  101   1 79.6
+    ## 2  1 0.00  0.74   0.000    0   2 79.6
+    ## 3  1 0.25  2.84   0.000    0   2 79.6
+    ## 4  1 0.57  6.57   0.000    0   2 79.6
+    ## 5  1 1.12 10.50   0.000    0   2 79.6
+    ## 6  1 2.02  9.66   0.000    0   2 79.6
+
+``` r
+summary(theo_sd)
+```
+
+    ##        ID             TIME               DV              AMT        
+    ##  Min.   : 1.00   Min.   : 0.0000   Min.   : 0.000   Min.   :  0.00  
+    ##  1st Qu.: 3.75   1st Qu.: 0.4675   1st Qu.: 1.500   1st Qu.:  0.00  
+    ##  Median : 6.50   Median : 2.8050   Median : 4.880   Median :  0.00  
+    ##  Mean   : 6.50   Mean   : 5.4034   Mean   : 4.547   Mean   : 26.29  
+    ##  3rd Qu.: 9.25   3rd Qu.: 7.5775   3rd Qu.: 6.947   3rd Qu.:  0.00  
+    ##  Max.   :12.00   Max.   :24.6500   Max.   :11.400   Max.   :320.65  
+    ##       EVID              CMT              WT       
+    ##  Min.   :  0.000   Min.   :1.000   Min.   :54.60  
+    ##  1st Qu.:  0.000   1st Qu.:2.000   1st Qu.:63.58  
+    ##  Median :  0.000   Median :2.000   Median :70.50  
+    ##  Mean   :  8.417   Mean   :1.917   Mean   :69.58  
+    ##  3rd Qu.:  0.000   3rd Qu.:2.000   3rd Qu.:74.42  
+    ##  Max.   :101.000   Max.   :2.000   Max.   :86.40
+
+``` r
+str(theo_sd)
+```
+
+    ## 'data.frame':    144 obs. of  7 variables:
+    ##  $ ID  : int  1 1 1 1 1 1 1 1 1 1 ...
+    ##  $ TIME: num  0 0 0.25 0.57 1.12 2.02 3.82 5.1 7.03 9.05 ...
+    ##  $ DV  : num  0 0.74 2.84 6.57 10.5 9.66 8.58 8.36 7.47 6.89 ...
+    ##  $ AMT : num  320 0 0 0 0 ...
+    ##  $ EVID: int  101 0 0 0 0 0 0 0 0 0 ...
+    ##  $ CMT : int  1 2 2 2 2 2 2 2 2 2 ...
+    ##  $ WT  : num  79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 79.6 ...
+
+## Plot data
+
+``` r
+ggplot(subset(theo_sd, EVID==0), aes(x = TIME, y = DV, group = factor(ID), color = factor(ID))) + geom_line() +  ylim(c(0, 12)) + xlab('Time')
+```
+
+![](101-Basic-Example_files/figure-gfm/plotdata-1.png)<!-- -->
+
+``` r
+ggplot(filter(theo_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 12)) + xlab('Time')
+```
+
+![](101-Basic-Example_files/figure-gfm/plotdata-2.png)<!-- -->
 
 ## Model
 
-The basic model consists of an ini block that has initial estimates
-
 ``` r
 one.compartment <- function() {
-  ini({
+
+#The basic model consists of an ini block that has initial estimates  
+ini({
     tka <- log(1.57); label("Ka")
     tcl <- log(2.72); label("Cl")
     tv <- log(31.5); label("V")
@@ -26,8 +97,9 @@ one.compartment <- function() {
     eta.v ~ 0.1
     add.sd <- 0.7
   })
-  # and a model block with the error specification and model specification
-  model({
+  
+# and a model block with the error specification and model specification
+model({
     ka <- exp(tka + eta.ka)
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
@@ -93,7 +165,7 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## → compress parHist in nlmixr2 object, save 9760
 
-    ## → compress saem0 in nlmixr2 object, save 30728
+    ## → compress saem0 in nlmixr2 object, save 30736
 
 ``` r
 print(fit)
@@ -106,8 +178,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup saem table compress other
-    ## elapsed 0.001 3.75  0.06     0.06 2.409
+    ##         setup covariance saem table compress other
+    ## elapsed  0.01       0.01 3.91  0.06     0.09  2.38
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -142,8 +214,6 @@ library(xpose.nlmixr2)
 ```
 
     ## Loading required package: xpose
-
-    ## Loading required package: ggplot2
 
     ## 
     ## Attaching package: 'xpose'
@@ -200,4 +270,4 @@ pmx_plot_dv_ipred(ctr)
     ## Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
     ## font family not found in Windows font database
 
-![](Basic-Example_files/figure-gfm/plot-1.png)<!-- -->
+![](101-Basic-Example_files/figure-gfm/plot_model-1.png)<!-- -->

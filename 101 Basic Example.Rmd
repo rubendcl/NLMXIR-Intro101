@@ -20,16 +20,49 @@ Basic Example
 
 ```{r, message=FALSE, warning=FALSE}
 library(nlmixr2)
+library(ggplot2)
+library(dplyr) # For 
+```
+
+## Data
+
+Multiple dose theophylline PK data
+
+This data set is the day 1 concentrations of the theophylline data.
+A data frame with 144 rows by 7 columns
+
+ID: Subject ID
+TIME: Time (hrs)
+DV: Dependent Variable, theophylline concentration
+AMT: Dose Amount/kg
+EVID: rxode2/nlmixr2 event ID (not NONMEM's)
+CMT: nCompartment Number
+WT: Weight (kg)
+
+```{r data}
+head(theo_sd)
+summary(theo_sd)
+str(theo_sd)
+```
+
+
+## Plot data
+
+```{r plotdata}
+ggplot(subset(theo_sd, EVID==0), aes(x = TIME, y = DV, group = factor(ID), color = factor(ID))) + geom_line() +  ylim(c(0, 12)) + xlab('Time')
+
+ggplot(filter(theo_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 12)) + xlab('Time')
 ```
 
 ## Model
 
-The basic model consists of an ini block that has initial estimates
 
 ```{r initial}
 
 one.compartment <- function() {
-  ini({
+
+#The basic model consists of an ini block that has initial estimates  
+ini({
     tka <- log(1.57); label("Ka")
     tcl <- log(2.72); label("Cl")
     tv <- log(31.5); label("V")
@@ -38,8 +71,9 @@ one.compartment <- function() {
     eta.v ~ 0.1
     add.sd <- 0.7
   })
-  # and a model block with the error specification and model specification
-  model({
+  
+# and a model block with the error specification and model specification
+model({
     ka <- exp(tka + eta.ka)
     cl <- exp(tcl + eta.cl)
     v <- exp(tv + eta.v)
@@ -49,7 +83,10 @@ one.compartment <- function() {
     cp ~ add(add.sd)
   })
 }
+
 ```
+
+
 
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
@@ -62,7 +99,7 @@ print(fit)
 
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
-```{r plot}
+```{r plot_model}
 library(xpose.nlmixr2)
 xpdb = xpose_data_nlmixr(fit)
 
