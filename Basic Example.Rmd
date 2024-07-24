@@ -1,0 +1,79 @@
+---
+title: "Basic Example"
+author: "Ruben Cabrera"
+date: "2023-07-24"
+output: 
+  github_document: default
+  html_document: default
+# always_allow_html: true
+# devtools::install_github("kupietz/kableExtra")
+# install.packages("xfun", repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Basic Example
+
+Basic Example
+
+```{r, message=FALSE, warning=FALSE}
+library(nlmixr2)
+```
+
+## Model
+
+The basic model consists of an ini block that has initial estimates
+
+```{r initial}
+
+one.compartment <- function() {
+  ini({
+    tka <- log(1.57); label("Ka")
+    tcl <- log(2.72); label("Cl")
+    tv <- log(31.5); label("V")
+    eta.ka ~ 0.6
+    eta.cl ~ 0.3
+    eta.v ~ 0.1
+    add.sd <- 0.7
+  })
+  # and a model block with the error specification and model specification
+  model({
+    ka <- exp(tka + eta.ka)
+    cl <- exp(tcl + eta.cl)
+    v <- exp(tv + eta.v)
+    d/dt(depot) <- -ka * depot
+    d/dt(center) <- ka * depot - cl / v * center
+    cp <- center / v
+    cp ~ add(add.sd)
+  })
+}
+```
+
+The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
+
+```{r fit}
+fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
+print(fit)
+
+
+```
+
+The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
+
+```{r plot}
+library(xpose.nlmixr2)
+xpdb = xpose_data_nlmixr(fit)
+
+
+library(xpose)
+plt <- dv_vs_ipred(xpdb)
+
+library(ggPMX)
+ctr = pmx_nlmixr(fit)
+pmx_plot_dv_ipred(ctr)
+```
+
+
+

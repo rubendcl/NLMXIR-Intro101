@@ -6,6 +6,8 @@ output:
   github_document: default
   html_document: default
 always_allow_html: true
+# devtools::install_github("kupietz/kableExtra")
+# install.packages("xfun", repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
 ---
 
 ```{r setup, include=FALSE}
@@ -32,12 +34,12 @@ library(nlmixr2)
 ```
 
 # Introduction
-This documents is an introduction of Non Linear Mixed Effects with the help of the R package NLMIXR2.
+This documents is an introduction of Non Linear Mixed Effects with the help of the R package nlmixr2.
 This example is based on: 
 https://nlmixr2.org/articles/addingCovariances.html
 
 # Data
-The data corresponds to Phenobarbitol, which is automatically loaded with MLMIXR 
+The data corresponds to Phenobarbitol, which is automatically loaded with nlmixr2 
 ```{r}
 #pheno_sd
 str(pheno_sd)
