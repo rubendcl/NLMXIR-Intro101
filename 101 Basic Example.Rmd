@@ -31,13 +31,13 @@ Multiple dose theophylline PK data
 This data set is the day 1 concentrations of the theophylline data.
 A data frame with 144 rows by 7 columns
 
-ID: Subject ID
-TIME: Time (hrs)
-DV: Dependent Variable, theophylline concentration
-AMT: Dose Amount/kg
-EVID: rxode2/nlmixr2 event ID (not NONMEM's)
-CMT: nCompartment Number
-WT: Weight (kg)
+- ID: Subject ID
+- TIME: Time (hrs)
+- DV: Dependent Variable, theophylline concentration
+- AMT: Dose Amount/kg
+- EVID: rxode2/nlmixr2 event ID (not NONMEM's)
+- CMT: nCompartment Number
+- WT: Weight (kg)
 
 ```{r data}
 head(theo_sd)
@@ -94,10 +94,40 @@ The fit is performed by the function nlmixr/nlmixr2 specifying the model, data a
 fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 print(fit)
 
-
 ```
 
-The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
+
+Output description
+
+```{r output}
+
+# Estimation of DV: PRED and IPRED
+
+mydata <- theo_sd[theo_sd$EVID==0,]
+plot(mydata$DV,fit$PRED)
+plot(mydata$DV,fit$IPRED)
+
+# What is the difference between PRED and IPRED?
+  
+# eta.ka:
+plot(mydata$ID,fit$eta.ka)
+plot(mydata$ID,fit$eta.cl)
+plot(mydata$ID,fit$eta.v)
+plot(mydata$ID,fit$cp)
+plot(mydata$DV,fit$cp)
+plot(mydata$DV,fit$depot)
+plot(mydata$DV,fit$center)   
+plot(mydata$DV,fit$ka)
+plot(mydata$DV,fit$cl)
+plot(mydata$DV,fit$v)
+plot(mydata$DV,fit$tad)
+plot(mydata$DV,fit$depot)
+plot(mydata$DV,fit$dosenum)
+```
+
+
+
+Plots
 
 ```{r plot_model}
 library(xpose.nlmixr2)

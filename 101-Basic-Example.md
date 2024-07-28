@@ -20,9 +20,13 @@ Multiple dose theophylline PK data
 This data set is the day 1 concentrations of the theophylline data. A
 data frame with 144 rows by 7 columns
 
-ID: Subject ID TIME: Time (hrs) DV: Dependent Variable, theophylline
-concentration AMT: Dose Amount/kg EVID: rxode2/nlmixr2 event ID (not
-NONMEM’s) CMT: nCompartment Number WT: Weight (kg)
+- ID: Subject ID
+- TIME: Time (hrs)
+- DV: Dependent Variable, theophylline concentration
+- AMT: Dose Amount/kg
+- EVID: rxode2/nlmixr2 event ID (not NONMEM’s)
+- CMT: nCompartment Number
+- WT: Weight (kg)
 
 ``` r
 head(theo_sd)
@@ -165,7 +169,7 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## → compress parHist in nlmixr2 object, save 9760
 
-    ## → compress saem0 in nlmixr2 object, save 30736
+    ## → compress saem0 in nlmixr2 object, save 30728
 
 ``` r
 print(fit)
@@ -178,8 +182,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup covariance saem table compress other
-    ## elapsed  0.01       0.01 3.91  0.06     0.09  2.38
+    ##         setup saem table compress other
+    ## elapsed 0.008 8.16  0.14     0.14 4.582
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -206,8 +210,105 @@ print(fit)
     ## # ℹ 7 more variables: depot <dbl>, center <dbl>, ka <dbl>, cl <dbl>, v <dbl>,
     ## #   tad <dbl>, dosenum <dbl>
 
-The fit is performed by the function nlmixr/nlmixr2 specifying the
-model, data and estimate
+Output description
+
+``` r
+# Estimation of DV: PRED and IPRED
+
+mydata <- theo_sd[theo_sd$EVID==0,]
+plot(mydata$DV,fit$PRED)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-1.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$IPRED)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-2.png)<!-- -->
+
+``` r
+# What is the difference between PRED and IPRED?
+  
+# eta.ka:
+plot(mydata$ID,fit$eta.ka)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-3.png)<!-- -->
+
+``` r
+plot(mydata$ID,fit$eta.cl)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-4.png)<!-- -->
+
+``` r
+plot(mydata$ID,fit$eta.v)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-5.png)<!-- -->
+
+``` r
+plot(mydata$ID,fit$cp)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-6.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$cp)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-7.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$depot)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-8.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$center)   
+```
+
+![](101-Basic-Example_files/figure-gfm/output-9.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$ka)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-10.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$cl)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-11.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$v)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-12.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$tad)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-13.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$depot)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-14.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$dosenum)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-15.png)<!-- -->
+
+Plots
 
 ``` r
 library(xpose.nlmixr2)
