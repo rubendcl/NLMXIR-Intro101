@@ -40,7 +40,6 @@ A data frame with 144 rows by 7 columns
 - WT: Weight (kg)
 
 ```{r data}
-?theo_sd
 head(theo_sd)
 summary(theo_sd)
 str(theo_sd)
