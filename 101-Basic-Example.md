@@ -29,6 +29,12 @@ data frame with 144 rows by 7 columns
 - WT: Weight (kg)
 
 ``` r
+?theo_sd
+```
+
+    ## starting httpd help server ... done
+
+``` r
 head(theo_sd)
 ```
 
@@ -182,8 +188,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup saem table compress other
-    ## elapsed 0.008 8.16  0.14     0.14 4.582
+    ##         setup covariance saem table compress other
+    ## elapsed 0.003       0.02  4.9  0.09     0.11 3.237
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -230,83 +236,172 @@ plot(mydata$DV,fit$IPRED)
 ``` r
 # What is the difference between PRED and IPRED?
   
-# eta.ka:
-plot(mydata$ID,fit$eta.ka)
+# 
+plot(mydata$TIME,fit$DV)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-3.png)<!-- -->
 
 ``` r
-plot(mydata$ID,fit$eta.cl)
+plot(mydata$ID,fit$eta.ka)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-4.png)<!-- -->
 
 ``` r
-plot(mydata$ID,fit$eta.v)
+plot(mydata$ID,fit$eta.cl)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-5.png)<!-- -->
 
 ``` r
-plot(mydata$ID,fit$cp)
+plot(mydata$ID,fit$eta.v)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-6.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$cp)
+plot(mydata$ID,fit$cp)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-7.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$depot)
+plot(mydata$DV,fit$cp)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-8.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$center)   
+plot(mydata$DV,fit$depot)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-9.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$ka)
+plot(mydata$TIME,fit$depot)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-10.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$cl)
+plot(mydata$DV,fit$center) 
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-11.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$v)
+plot(mydata$TIME,fit$center)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-12.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$tad)
+plot(mydata$DV,fit$ka)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-13.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$depot)
+plot(mydata$DV,fit$cl)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-14.png)<!-- -->
 
 ``` r
-plot(mydata$DV,fit$dosenum)
+plot(mydata$DV,fit$v)
 ```
 
 ![](101-Basic-Example_files/figure-gfm/output-15.png)<!-- -->
+
+``` r
+plot(fit$tad,mydata$DV)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-16.png)<!-- -->
+
+``` r
+plot(mydata$DV,fit$depot)
+```
+
+![](101-Basic-Example_files/figure-gfm/output-17.png)<!-- -->
+
+Output description
+
+``` r
+# fit
+plot(fit)
+```
+
+![](101-Basic-Example_files/figure-gfm/outputfit-1.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-2.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+    ## Warning in ggplot2::scale_y_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-3.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-4.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-5.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-6.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-7.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-8.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-9.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-10.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-11.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-12.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-13.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-14.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-15.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-16.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-17.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-18.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-19.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-20.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-21.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-22.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-23.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-24.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-25.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-26.png)<!-- -->
+
+    ## Warning in ggplot2::scale_x_log10(..., breaks = breaks, minor_breaks =
+    ## minor_breaks, : log-10 transformation introduced infinite values.
+
+![](101-Basic-Example_files/figure-gfm/outputfit-27.png)<!-- -->![](101-Basic-Example_files/figure-gfm/outputfit-28.png)<!-- -->
 
 Plots
 

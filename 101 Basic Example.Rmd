@@ -97,7 +97,6 @@ print(fit)
 
 ```
 
-
 Output description
 
 ```{r output}
@@ -110,20 +109,32 @@ plot(mydata$DV,fit$IPRED)
 
 # What is the difference between PRED and IPRED?
   
-# eta.ka:
+# 
+plot(mydata$TIME,fit$DV)
 plot(mydata$ID,fit$eta.ka)
 plot(mydata$ID,fit$eta.cl)
 plot(mydata$ID,fit$eta.v)
 plot(mydata$ID,fit$cp)
 plot(mydata$DV,fit$cp)
 plot(mydata$DV,fit$depot)
-plot(mydata$DV,fit$center)   
+plot(mydata$TIME,fit$depot)
+plot(mydata$DV,fit$center) 
+plot(mydata$TIME,fit$center)
 plot(mydata$DV,fit$ka)
 plot(mydata$DV,fit$cl)
 plot(mydata$DV,fit$v)
-plot(mydata$DV,fit$tad)
+plot(fit$tad,mydata$DV)
 plot(mydata$DV,fit$depot)
-plot(mydata$DV,fit$dosenum)
+
+```
+
+
+Output description
+
+```{r outputfit}
+
+# fit
+plot(fit)
 ```
 
 

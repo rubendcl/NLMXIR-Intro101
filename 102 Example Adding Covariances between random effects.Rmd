@@ -1,7 +1,7 @@
 ---
 title: "Basic Example"
 author: "Ruben Cabrera"
-date: "2023-07-24"
+date: "2023-07-29"
 output: 
   github_document: default
   html_document: default
@@ -16,42 +16,65 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Basic Example
 
-Basic Example
+Adding Covariances between random effects
 
 ```{r, message=FALSE, warning=FALSE}
 library(nlmixr2)
 library(ggplot2)
-library(dplyr) # For 
+library(ggforce) # facet_wrap_paginate
+library(dplyr) # For filter 
 ```
 
 ## Data
 
-Multiple dose theophylline PK data
+Phenobarbitol data:
 
-This data set is the day 1 concentrations of the theophylline data.
-A data frame with 144 rows by 7 columns
+This is from a PK study in neonatal infants. They received multiple doses of phenobarbital for seizure prevention.
+A data frame with 744 rows and 8 columns
 
-- ID: Subject ID
-- TIME: Time (hrs)
-- DV: Dependent Variable, theophylline concentration
-- AMT: Dose Amount/kg
-- EVID: rxode2/nlmixr2 event ID (not NONMEM's)
-- CMT: nCompartment Number
+- ID: Infant  ID
+- TIME: Time of (hr)
+- AMT: Dose in (ug/kg)
 - WT: Weight (kg)
+- APGR: A 5-minute Apgar score to measure infant health
+- DV: The concentration of phenobarbitol in the serum (ug/mL)
+- MDV: If the dependent variable (DV) is missing; 0 for observations, 1 for doses
+- EVID: Event ID
+
 
 ```{r data}
-head(theo_sd)
-summary(theo_sd)
-str(theo_sd)
+# ?pheno_sd
+head(pheno_sd)
+summary(pheno_sd)
+str(pheno_sd)
+```
+```{r}
+
+# Plot data AMT Dose in (ug/kg)
+ggplot(filter(pheno_sd,EVID==1), aes(x=TIME, y = AMT, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 70)) + xlab('Time')
+
+## Plot data DV concentration of phenobarbitol
+
+ggplot(filter(pheno_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 70)) + xlab('Time')
+
+# Could be interesting plot AMT vs DV (using the last data recorded in both axis)
+
 ```
 
 
-## Plot data
+```{r, fig.height=10}
 
-```{r plotdata}
-ggplot(subset(theo_sd, EVID==0), aes(x = TIME, y = DV, group = factor(ID), color = factor(ID))) + geom_line() +  ylim(c(0, 12)) + xlab('Time')
+# The superposition of doses as vertical black lines on concentration profiles
 
-ggplot(filter(theo_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 12)) + xlab('Time')
+pAMT <- geom_segment(data=filter(pheno_sd,EVID==1), aes(x=TIME, xend=TIME, y=0, yend=AMT), size=1)
+
+pDV <- geom_point(data=filter(pheno_sd,EVID==0), aes(x=TIME, y=DV,  color=factor(ID)), size=3)
+
+ggplot() + pAMT
+ggplot() + pDV
+
+ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + theme(legend.position="none") + ylab("Dose and Concentration (mg/L)")
+
 ```
 
 ## Model
@@ -59,28 +82,22 @@ ggplot(filter(theo_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=fact
 
 ```{r initial}
 
-one.compartment <- function() {
-
-#The basic model consists of an ini block that has initial estimates  
-ini({
-    tka <- log(1.57); label("Ka")
-    tcl <- log(2.72); label("Cl")
-    tv <- log(31.5); label("V")
-    eta.ka ~ 0.6
-    eta.cl ~ 0.3
-    eta.v ~ 0.1
-    add.sd <- 0.7
+pheno <- function() {
+  ini({
+    tcl <- log(0.008) # typical value of clearance
+    tv <-  log(0.6)   # typical value of volume
+    ## var(eta.cl)
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
   })
-  
-# and a model block with the error specification and model specification
-model({
-    ka <- exp(tka + eta.ka)
-    cl <- exp(tcl + eta.cl)
-    v <- exp(tv + eta.v)
-    d/dt(depot) <- -ka * depot
-    d/dt(center) <- ka * depot - cl / v * center
-    cp <- center / v
-    cp ~ add(add.sd)
+  model({
+    cl <- exp(tcl + eta.cl) # individual value of clearance
+    v <- exp(tv + eta.v)    # individual value of volume
+    ke <- cl / v            # elimination rate constant
+    d/dt(A1) = - ke * A1    # model differential equation
+    cp = A1 / v             # concentration in plasma
+    cp ~ add(add.err)       # define error model
   })
 }
 
@@ -91,7 +108,7 @@ model({
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
 ```{r fit}
-fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
+fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
 print(fit)
 
 ```
@@ -103,9 +120,10 @@ Output description
 
 # Estimation of DV: PRED and IPRED
 
-mydata <- theo_sd[theo_sd$EVID==0,]
+mydata <- pheno_sd[pheno_sd$EVID==0,]
 plot(mydata$DV,fit$PRED)
 plot(mydata$DV,fit$IPRED)
+plot(mydata$DV,fit$EPRED)
 
 # What is the difference between PRED and IPRED?
   
