@@ -160,5 +160,10 @@ ctr = pmx_nlmixr(fit)
 pmx_plot_dv_ipred(ctr)
 ```
 
+Plots
+
+```{r plot_fit}
+plot(fit)
+```
 
 

@@ -173,8 +173,6 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## ✔ done
 
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
     ## rxode2 2.0.13 using 6 threads (see ?getRxThreads)
     ##   no cache: create with `rxCreateCache()`
 
@@ -241,6 +239,8 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## → compress parHist in nlmixr2 object, save 7880
 
+    ## → compress saem0 in nlmixr2 object, save 1632
+
 ``` r
 print(fit)
 ```
@@ -252,8 +252,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup optimize covariance  saem table compress
-    ## elapsed 0.009        0       0.04 11.87  4.92     0.08
+    ##         setup optimize covariance saem table compress
+    ## elapsed 0.002        0       0.01 8.19  4.15      0.1
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -430,11 +430,6 @@ library(ggPMX)
 
 ``` r
 ctr = pmx_nlmixr(fit)
-```
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
-``` r
 pmx_plot_dv_ipred(ctr)
 ```
 
@@ -444,3 +439,59 @@ pmx_plot_dv_ipred(ctr)
     ## font family not found in Windows font database
 
 ![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_model-1.png)<!-- -->
+
+Plots
+
+``` r
+plot(fit)
+```
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-1.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-2.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-3.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-4.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-5.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-6.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-7.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-8.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-9.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-10.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-11.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-12.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-13.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-14.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-15.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-16.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-17.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-18.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-19.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-20.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-21.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-22.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-23.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-24.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-25.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-26.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-27.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-28.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-29.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-30.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-31.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-32.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-33.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-34.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-35.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-36.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-37.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-38.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-39.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-40.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-41.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-42.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-43.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-44.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-45.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-46.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-47.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-48.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-49.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-50.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-51.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-52.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-53.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-54.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-55.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-56.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-57.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-58.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-59.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-60.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-61.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-62.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-63.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-64.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-65.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-66.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-67.png)<!-- -->
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-68.png)<!-- -->
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-69.png)<!-- -->
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-70.png)<!-- -->
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-71.png)<!-- -->
