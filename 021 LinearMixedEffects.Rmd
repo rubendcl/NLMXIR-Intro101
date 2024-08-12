@@ -1,0 +1,208 @@
+---
+title: "Basic Example"
+author: "Ruben Cabrera"
+date: "2023-08-01"
+output: 
+  github_document: default
+  html_document: default
+# always_allow_html: true
+# devtools::install_github("kupietz/kableExtra")
+# install.packages("xfun", repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Basic Example
+
+Basic Example
+
+https://www.youtube.com/watch?v=oI1_SV1Rpfc
+
+```{r, message=FALSE, warning=FALSE}
+
+library(nlme)
+library(lmerTest)
+library(ggplot2)
+library(dplyr) # For filter
+library(lattice)
+# install.packages("sjPlot")
+library(sjPlot) # To use plot_model
+
+```
+
+## Data
+
+Weight ~ Weeks + (1|Subjects)
+
+```{r data}
+df <- data.frame(
+  Weight=c(102,96,83,79,97,93,79,77,95,87,78,75,93,85,74,72),
+  Subjects=c(1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4),
+  Diet=c('A','A','B','B','A','A','B','B','A','A','B','B','A','A','B','B'),
+  Weeks=c(0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3)
+)
+```
+
+
+## Plot data
+
+```{r plotdata}
+ggplot(df, aes(x = Weeks, y = Weight, group = factor(Subjects), color = factor(Subjects))) + geom_line()+ geom_point() + xlab('Weeks')
+
+```
+
+## Model 1
+
+```{r model1}
+M1 <- lmer(Weight ~ Weeks+(1|Subjects),REML = F, data = df)
+summary(M1)
+random.effects(M1)  # ranefe(M1)  random.effects(M1)
+```
+
+# Plots Model M1
+
+```{r M1_plots}
+
+# Residuals vs Fitted
+plot(M1, which = 1)
+
+# Dotplot of random effects
+dotplot(ranef(M1, condVar = TRUE))
+
+# Install and load the sjPlot package
+
+# Plot fixed and random effects
+sjPlot::plot_model(M1, type = "re")
+
+# Plot general fit
+
+ggplot(df, aes(x = Weeks, y = Weight, color = factor(Subjects))) +
+  geom_point() +
+  geom_line(aes(group = Subjects), linetype = "dashed") +
+  geom_smooth(method = "lm", se = FALSE, color = "black")
+
+# Extract fitted values
+df$fitted <- fitted(M1)
+
+# Plot fitted
+
+ggplot(df, aes(x = Weeks, y = Weight, color = Subjects)) +
+  geom_point() +
+  geom_line(aes(y = fitted, group = Subjects)) +
+  labs(title = "Fitted Values for Each Subject", x = "Weeks", y = "Weight")
+
+```
+# Model 2
+
+```{r model2}
+M2 <- lmer(Weight ~ Weeks+(1+Weeks|Subjects),REML = F, data = df)
+summary(M2)
+random.effects(M2)  # ranefe(M2)
+
+```
+
+# Plots Model M2
+
+```{r M2_plots}
+# Residuals vs Fitted
+plot(M2, which = 1)
+
+# Extract fitted values
+df$fitted <- fitted(M2)
+
+# Plot fitted
+
+ggplot(df, aes(x = Weeks, y = Weight, color = Subjects)) +
+  geom_point() +
+  geom_line(aes(y = fitted, group = Subjects)) +
+  labs(title = "Fitted Values for Each Subject", x = "Weeks", y = "Weight")
+
+
+```
+
+
+
+# Model 3
+
+```{r model3}
+M3 <- lmer(Weight ~ Weeks+(0+Weeks|Subjects),REML = F, data = df)
+summary(M3)
+random.effects(M3)  # ranefe(M3)
+
+```
+
+# Plots Model M3
+
+```{r M3_plots}
+# Residuals vs Fitted
+plot(M3, which = 1)
+
+# Extract fitted values
+df$fitted <- fitted(M3)
+
+# Plot fitted
+
+ggplot(df, aes(x = Weeks, y = Weight, color = Subjects)) +
+  geom_point() +
+  geom_line(aes(y = fitted, group = Subjects)) +
+  labs(title = "Fitted Values for Each Subject", x = "Weeks", y = "Weight")
+
+
+```
+
+
+# Model 4
+
+```{r model4}
+M4 <- lmer(Weight ~ Weeks+Diet+(1|Subjects),REML = F, data = df)
+summary(M4)
+random.effects(M4)  # ranefe(M3)
+coef(M4)
+fixef(M4)
+
+```
+
+# Plots Model M4
+
+```{r M4_plots}
+# Residuals vs Fitted
+plot(M4, which = 1)
+
+# Extract fitted values
+df$fitted <- fitted(M4)
+
+# Plot fitted by Subjects
+p <- ggplot()
+p <- p + geom_point(data=df, aes(x = Weeks, y = Weight, color = Subjects))
+p
+
+plot_fit_by_subjects <- geom_line(data = df, aes(x = Weeks, y = fitted, group = Subjects)) 
+q <- p + plot_fit_by_subjects
+q + labs(title = "Fitted Values for Each Subject", x = "Weeks", y = "Weight")
+
+
+# Plot fitted by Diet
+df$fit_by_Diet <- ifelse(df$Diet=='A',fixef(M4)["(Intercept)"] + df$Weeks*fixef(M4)["Weeks"],
+                         fixef(M4)["(Intercept)"] + df$Weeks*fixef(M4)["Weeks"]+fixef(M4)["DietB"])
+
+
+plot_fit_by_diets <- geom_line(data = df, aes(x = Weeks, y = fit_by_Diet, group = Diet)) 
+r <- p + plot_fit_by_diets
+r + labs(title = "Fitted Values for Each Diet", x = "Weeks", y = "Weight")
+
+
+plot_model(M4,type ="pred", terms = c("Weeks","Diet"))
+
+
+
+```
+
+
+
+
+
+
+
+
