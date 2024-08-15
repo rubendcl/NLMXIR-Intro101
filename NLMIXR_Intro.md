@@ -25,13 +25,13 @@ library(nlmixr2)
 # Introduction
 
 This documents is an introduction of Non Linear Mixed Effects with the
-help of the R package NLMIXR2. This example is based on:
+help of the R package nlmixr2. This example is based on:
 <https://nlmixr2.org/articles/addingCovariances.html>
 
 # Data
 
 The data corresponds to Phenobarbitol, which is automatically loaded
-with MLMIXR
+with nlmixr2
 
 ``` r
 #pheno_sd
@@ -615,11 +615,6 @@ A time series with higher resolution in time can be calculated as
 
 ``` r
 fit.time.series.aug <- mutate( as.data.frame( augPred( fit )  ), ID=id )%>% select(-id)
-```
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
-``` r
 nrow(fit.time.series.aug)
 ```
 
