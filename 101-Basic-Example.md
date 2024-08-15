@@ -144,6 +144,8 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## ✔ done
 
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
     ## rxode2 2.0.13 using 6 threads (see ?getRxThreads)
     ##   no cache: create with `rxCreateCache()`
 
@@ -165,6 +167,8 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## ✔ done
 
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
     ## → Calculating residuals/tables
 
     ## ✔ done
@@ -175,7 +179,7 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## → compress parHist in nlmixr2 object, save 9760
 
-    ## → compress saem0 in nlmixr2 object, save 30728
+    ## → compress saem0 in nlmixr2 object, save 29008
 
 ``` r
 print(fit)
@@ -188,8 +192,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup covariance saem table compress other
-    ## elapsed 0.003       0.02  4.9  0.09     0.11 3.237
+    ##         setup covariance  saem table compress other
+    ## elapsed 0.006       0.01 12.99  0.18     0.17 9.504
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -422,6 +426,50 @@ library(xpose.nlmixr2)
 xpdb = xpose_data_nlmixr(fit)
 ```
 
+    ## → loading into symengine environment...
+
+    ## → pruning branches (`if`/`else`) of full model...
+
+    ## ✔ done
+
+    ## → calculate jacobian
+
+    ## → calculate sensitivities
+
+    ## → calculate ∂(f)/∂(η)
+
+    ## → calculate ∂(R²)/∂(η)
+
+    ## → finding duplicate expressions in inner model...
+
+    ## → optimizing duplicate expressions in inner model...
+
+    ## → finding duplicate expressions in EBE model...
+
+    ## → optimizing duplicate expressions in EBE model...
+
+    ## → compiling inner model...
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+    ## ✔ done
+
+    ## → finding duplicate expressions in FD model...
+
+    ## → optimizing duplicate expressions in FD model...
+
+    ## → compiling EBE model...
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+    ## ✔ done
+
+    ## → compiling events FD model...
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+    ## ✔ done
+
     ## → Calculating residuals/tables
 
     ## ✔ done
@@ -453,7 +501,11 @@ ctr = pmx_nlmixr(fit)
 
     ## → Add NPDE
 
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
     ## ✔ done
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
 
     ## Calculating -2LL by Gaussian quadrature (nnodes=3,nsd=1.6)
 

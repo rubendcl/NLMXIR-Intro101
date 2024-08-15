@@ -57,7 +57,6 @@ ggplot(filter(theo_sd,EVID==0), aes(x=TIME, y = DV, group=factor(ID), color=fact
 
 ## Model
 
-
 ```{r initial}
 
 one.compartment <- function() {
@@ -86,7 +85,6 @@ model({
 }
 
 ```
-
 
 
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
