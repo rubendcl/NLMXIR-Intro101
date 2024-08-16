@@ -6,6 +6,7 @@ Ruben Cabrera
 ## Basic Example
 
 Adding Covariances between random effects
+<https://nlmixr2.org/articles/addingCovariances.html>
 
 ``` r
 library(nlmixr2)
@@ -173,6 +174,8 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## ✔ done
 
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
     ## rxode2 2.0.13 using 6 threads (see ?getRxThreads)
     ##   no cache: create with `rxCreateCache()`
 
@@ -192,7 +195,59 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## ✔ done
 
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
     ## → Calculating residuals/tables
+
+    ## → loading into symengine environment...
+
+    ## → pruning branches (`if`/`else`) of full model...
+
+    ## ✔ done
+
+    ## → calculate jacobian
+
+    ## → calculate sensitivities
+
+    ## → calculate ∂(f)/∂(η)
+
+    ## → calculate ∂(R²)/∂(η)
+
+    ## → finding duplicate expressions in inner model...
+
+    ## → optimizing duplicate expressions in inner model...
+
+    ## → finding duplicate expressions in EBE model...
+
+    ## → optimizing duplicate expressions in EBE model...
+
+    ## → compiling inner model...
+
+    ## ✔ done
+
+    ## → finding duplicate expressions in FD model...
+
+    ## → optimizing duplicate expressions in FD model...
+
+    ## → compiling EBE model...
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+    ## ✔ done
+
+    ## → compiling events FD model...
+
+    ## ✔ done
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+    ## ✔ done
+
+    ## → compress origData in nlmixr2 object, save 33192
+
+    ## → compress phiM in nlmixr2 object, save 233144
+
+    ## → compress parHist in nlmixr2 object, save 7880
 
     ## → loading into symengine environment...
 
@@ -231,15 +286,6 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
     ## → compiling events FD model...
 
     ## ✔ done
-    ## ✔ done
-
-    ## → compress origData in nlmixr2 object, save 33192
-
-    ## → compress phiM in nlmixr2 object, save 233144
-
-    ## → compress parHist in nlmixr2 object, save 7880
-
-    ## → compress saem0 in nlmixr2 object, save 1632
 
 ``` r
 print(fit)
@@ -252,8 +298,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup optimize covariance saem table compress
-    ## elapsed 0.002        0       0.01 8.19  4.15      0.1
+    ##         setup optimize covariance  saem table compress
+    ## elapsed 0.008        0       0.02 17.25 10.05     0.13
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -430,6 +476,11 @@ library(ggPMX)
 
 ``` r
 ctr = pmx_nlmixr(fit)
+```
+
+    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
+
+``` r
 pmx_plot_dv_ipred(ctr)
 ```
 

@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Basic Example
 
 Adding Covariances between random effects
+https://nlmixr2.org/articles/addingCovariances.html
 
 ```{r, message=FALSE, warning=FALSE}
 library(nlmixr2)
@@ -48,7 +49,7 @@ head(pheno_sd)
 summary(pheno_sd)
 str(pheno_sd)
 ```
-```{r}
+```{r, fig.height=5}
 
 # Plot data AMT Dose in (ug/kg)
 ggplot(filter(pheno_sd,EVID==1), aes(x=TIME, y = AMT, group=factor(ID), color=factor(ID))) + geom_line() + geom_point() + ylim(c(0, 70)) + xlab('Time')
@@ -79,9 +80,7 @@ ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + them
 
 ## Model
 
-
 ```{r initial}
-
 pheno <- function() {
   ini({
     tcl <- log(0.008) # typical value of clearance
