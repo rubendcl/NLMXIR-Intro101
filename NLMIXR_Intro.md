@@ -112,8 +112,12 @@ p + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1)
 
 The differential equation for the amount is
 
-$$ \frac{A_1}{dt } = - k_e A_1 
-$$ The concentration is $$C_p = \frac{A_1}{V}$$
+$$ \frac{A_1}{dt } = - k_e A_1 $$
+
+The concentration is
+
+$$C_p = \frac{A_1}{V}
+$$
 
 The clearance is defined from $$k_e = \frac{CL}{V}$$ It is usual to
 parametrize the model in terms of clearance and volume instead of $k_e$.
@@ -616,11 +620,6 @@ A time series with higher resolution in time can be calculated as
 
 ``` r
 fit.time.series.aug <- mutate( as.data.frame( augPred( fit )  ), ID=id )%>% select(-id)
-```
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
-``` r
 nrow(fit.time.series.aug)
 ```
 

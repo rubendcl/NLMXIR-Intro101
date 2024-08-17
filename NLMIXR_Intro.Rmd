@@ -93,10 +93,12 @@ p + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1)
 
 The differential equation for the amount is
 
-$$ \frac{A_1}{dt } = - k_e A_1 
-$$
+$$ \frac{A_1}{dt } = - k_e A_1 $$
+
 The concentration is 
-$$C_p = \frac{A_1}{V}$$
+
+$$C_p = \frac{A_1}{V}
+$$
 
 The clearance is defined from 
 $$k_e = \frac{CL}{V}$$
