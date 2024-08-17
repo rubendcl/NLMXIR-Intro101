@@ -97,14 +97,16 @@ $$ \frac{A_1}{dt } = - k_e A_1 $$
 
 The concentration is 
 
-$$C_p = \frac{A_1}{V}
-$$
+$$C_p = \frac{A_1}{V}$$
 
-The clearance is defined from 
+The clearance is defined from
+
 $$k_e = \frac{CL}{V}$$
+
 It is usual to parametrize the model in terms of clearance and volume instead of $k_e$.
 
-The actual fitting parametrization is carried out in term of so called typical values $LogTVCL$ and $LogTVV$:
+The actual fitting parametrization is carried out in term of so called typical values $LogTVCL$ and $LogTVV$ :
+
 
 $$
 \begin{align}
