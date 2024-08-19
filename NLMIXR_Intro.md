@@ -112,7 +112,7 @@ p + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1)
 
 The differential equation for the amount is
 
-$$ \frac{A_1}{dt } = - k_e A_1 $$
+$$ \frac{d A_1}{dt } = - k_e A_1 $$
 
 The concentration is
 
@@ -155,8 +155,7 @@ pheno <- function() {
     LogTVCL <- log(0.008) # typical value of log clearance with initial value CL=0.008
     LogTVV <-  log(0.6)   # typical value of log volume with initial value V=0.6 
     ## var(eta.cl)
-    eta.cl + eta.v ~ c(1, 
-                       0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
                       # interindividual variability on clearance and volume
     add.err <- 0.1    # residual variability
   })
