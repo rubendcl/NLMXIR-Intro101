@@ -1,7 +1,7 @@
 Basic Example
 ================
 Ruben Cabrera
-2023-07-29
+2024-07-29
 
 ## Basic Example
 
@@ -132,13 +132,79 @@ ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + them
 
 ## Model
 
+# Compartmental Models
+
+Pharmacokinetics is the study of the time course of a drug and its
+metabolites following introduction into the body. In this section we
+describe a class of models that has been extensively used in such
+studies to model individual drug concentrations, $y(t)$, as a function
+of the time $t$.
+
+Let $A_i(t)$ represent the amount of drug in compartment $i$, $i=0,1$ at
+time $t$, with compartment 0 representing the site from which absorption
+occurs. The differential equations describing the drug flow between the
+compartments may be assumed to be of the form
+
+$$ \frac{d A_0}{d t} = -k_a A_0
+$$
+
+$$ \frac{d A_1}{d t} = k_a A_0 - k_e A_1
+$$
+
+where $k_a$ is the absorption rate constant associated with flow from
+compartment 0 to compartment 1, and $k_e$ is the elimination rate
+constant.
+
+With only one compartment $A_1$, the differential equation for the
+amount $A_1$ is
+
+$$ \frac{d A_1}{dt } = - k_e A_1 $$
+
+The concentration is
+
+$$C_p = \frac{A_1(t)}{V(t)}$$ and considering $V$ as volume, the
+clearance \$ CL \$ is defined from
+
+$$k_e = \frac{CL}{V}$$
+
+It is usual to parametrize the model in terms of clearance $CL$ and
+volume $V$ instead of $k_e$.
+
+The actual fitting parametrization is carried out in term of so called
+typical values for clearance and volume $tcl$ and $tv$ :
+
+$$
+\begin{align}
+  CL =& e^{ tcl + \eta_{CL} }  \\
+  V  =& e^{ tv  + \eta_{V} } 
+\end{align}
+$$ where $\eta_{CL}$ and $\eta_{V}$ are random variables obeying normal
+distributions with mean zero and covariance matrix $\Omega$. The
+components of $\Omega$ are then additional fit parameters. The matrix
+$\Omega$ and the variables $\eta$ are responsible to explain random
+inter-individual variability.
+
+$$(\eta_{CL} , \eta_{V}) \approx   N(0, \Omega)  $$ If $\Omega$ is a
+diagonal matrix, the inter-individual variabilities are independent.
+Otherwise, they have some correlation.
+
+The residual error model provides the final random variability on the
+predicted concentration. The residual error model in this example is
+
+$$C_{obs} = C_p + \varepsilon$$
+
+where $C_{obs}$ is the observed concentration, $C_p$ is the
+concentration in plasma and $\varepsilon$ is a normal random variable
+(specified by $add.err=\sigma^2$).
+
+$$ \varepsilon \approx N(0, \sigma^2) $$
+
 ``` r
 pheno <- function() {
   ini({
     tcl <- log(0.008) # typical value of clearance
     tv <-  log(0.6)   # typical value of volume
-    ## var(eta.cl)
-    eta.cl + eta.v ~ c(1, 0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## var(eta.cl), cov(eta.cl, eta.v), var(eta.v)
                       # interindividual variability on clearance and volume
     add.err <- 0.1    # residual variability
   })
@@ -174,8 +240,6 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## ✔ done
 
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
     ## rxode2 2.0.13 using 6 threads (see ?getRxThreads)
     ##   no cache: create with `rxCreateCache()`
 
@@ -194,8 +258,6 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
     ## → finding duplicate expressions in saem predOnly model 2...
 
     ## ✔ done
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
 
     ## → Calculating residuals/tables
 
@@ -231,16 +293,11 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## → compiling EBE model...
 
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
     ## ✔ done
 
     ## → compiling events FD model...
 
     ## ✔ done
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
     ## ✔ done
 
     ## → compress origData in nlmixr2 object, save 33192
@@ -249,43 +306,7 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## → compress parHist in nlmixr2 object, save 7880
 
-    ## → loading into symengine environment...
-
-    ## → pruning branches (`if`/`else`) of full model...
-
-    ## ✔ done
-
-    ## → calculate jacobian
-
-    ## → calculate sensitivities
-
-    ## → calculate ∂(f)/∂(η)
-
-    ## → calculate ∂(R²)/∂(η)
-
-    ## → finding duplicate expressions in inner model...
-
-    ## → optimizing duplicate expressions in inner model...
-
-    ## → finding duplicate expressions in EBE model...
-
-    ## → optimizing duplicate expressions in EBE model...
-
-    ## → compiling inner model...
-
-    ## ✔ done
-
-    ## → finding duplicate expressions in FD model...
-
-    ## → optimizing duplicate expressions in FD model...
-
-    ## → compiling EBE model...
-
-    ## ✔ done
-
-    ## → compiling events FD model...
-
-    ## ✔ done
+    ## → compress saem0 in nlmixr2 object, save 1640
 
 ``` r
 print(fit)
@@ -298,8 +319,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup optimize covariance  saem table compress
-    ## elapsed 0.008        0       0.02 17.25 10.05     0.13
+    ##         setup optimize covariance saem table compress
+    ## elapsed 0.002        0       0.02 8.03  2.49     0.12
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -334,7 +355,69 @@ print(fit)
     ## #   CRES <dbl>, CWRES <dbl>, eta.cl <dbl>, eta.v <dbl>, A1 <dbl>, cl <dbl>,
     ## #   v <dbl>, ke <dbl>, tad <dbl>, dosenum <dbl>
 
-Output description
+``` r
+str(fit)
+```
+
+    ## nlmxr2FD [155 × 26] (S3: nlmixr2FitData/nlmixr2FitCore/nlmixr2.saem/tbl_df/tbl/data.frame)
+    ##  $ ID     : Factor w/ 59 levels "1","2","3","4",..: 1 1 2 2 2 3 3 3 4 4 ...
+    ##  $ TIME   : num [1:155] 2 112.5 2 63.5 135.5 ...
+    ##  $ DV     : num [1:155] 17.3 31 9.7 24.6 33 18 23.8 24.3 20.8 23.9 ...
+    ##  $ EPRED  : num [1:155] 18.8 29.9 10.9 20 27.6 ...
+    ##  $ ERES   : num [1:155] -1.53 1.15 -1.18 4.61 5.35 ...
+    ##  $ NPDE   : num [1:155] -0.422 0.394 -0.994 -0.358 0.553 ...
+    ##  $ NPD    : num [1:155] 0.0167 0.3943 -0.1934 0.664 0.5534 ...
+    ##  $ PDE    : num [1:155] 0.337 0.653 0.16 0.36 0.71 ...
+    ##  $ PD     : num [1:155] 0.507 0.653 0.423 0.747 0.71 ...
+    ##  $ PRED   : num [1:155] 17.5 27.9 10.5 19.2 26.9 ...
+    ##  $ RES    : num [1:155] -0.222 3.11 -0.813 5.395 6.113 ...
+    ##  $ WRES   : num [1:155] -0.0297 0.2545 -0.1618 0.6382 0.5135 ...
+    ##  $ IPRED  : num [1:155] 18.5 29.6 12.5 23 32.4 ...
+    ##  $ IRES   : num [1:155] -1.184 1.374 -2.771 1.619 0.615 ...
+    ##  $ IWRES  : num [1:155] -0.418 0.485 -0.978 0.571 0.217 ...
+    ##  $ CPRED  : num [1:155] 17.5 27.8 10.3 18.9 26.4 ...
+    ##  $ CRES   : num [1:155] -0.196 3.161 -0.641 5.739 6.631 ...
+    ##  $ CWRES  : num [1:155] -0.025 0.245 -0.113 0.578 0.468 ...
+    ##  $ eta.cl : num [1:155] -0.0743 -0.0743 -0.2123 -0.2123 -0.2123 ...
+    ##  $ eta.v  : num [1:155] -0.0533 -0.0533 -0.1704 -0.1704 -0.1704 ...
+    ##  $ A1     : num [1:155] 24.8 39.7 14.9 27.4 38.6 ...
+    ##  $ cl     : num [1:155] 0.00629 0.00629 0.00548 0.00548 0.00548 ...
+    ##  $ v      : num [1:155] 1.34 1.34 1.19 1.19 1.19 ...
+    ##  $ ke     : num [1:155] 0.00469 0.00469 0.0046 0.0046 0.0046 ...
+    ##  $ tad    : num [1:155] 2 4 2 11.5 11.5 ...
+    ##  $ dosenum: num [1:155] 1 10 1 6 12 1 7 12 1 5 ...
+    ##  $ cor       :  correlation matrix of theta, calculated from covariance of theta
+    ##  $ finalUi   :  The final ui used to run the model
+    ##  $ foceiControl:  Get the focei control required for creating the nlmixr object
+    ##  $ iniUi     :  The initial ui used to run the model
+    ##  $ ipredModel:  rxode2 estimation model for fit
+    ##  $ modelName :  name of the model used for nlmixr2 model fit
+    ##  $ omegaR    :  correlation matrix of omega
+    ##  $ parHistStacked:  stacked parameter history
+    ##  $ phiR      :  correlation matrix of each individual's eta (if present)
+    ##  $ phiRSE    :  relative standard error of each individual's eta (if present)
+    ##  $ phiSE     :  standard error of each individual's eta (if present)
+    ##  $ rxControl :  rxode2 solving options
+    ##  $ ui        :  The final ui used to run the model
+    ##  $ ui        :  rxode2 user interface
+    ##  $ conditionNumberCor:  Condition Number (Correlation)
+    ##  $ conditionNumberCov:  Condition Number (Covariance)
+    ##  $ cov       :  Covariance of fixed effects
+    ##  $ covMethod :  Covariance Method for fixed effects
+    ##  $ etaObf    :  ETAs and their individual objective function contribution (if applicable)
+    ##  $ objDf     :  Objective Function DF
+    ##  $ omega     :  Omega Matrix
+    ##  $ origData  :  Original Data
+    ##  $ parFixed  :  Formatted Parameter Values for Fixed effects
+    ##  $ parFixedDf:  Parameter Values for Fixed Effects (data frame)
+    ##  $ parHist   :  Parameter History
+    ##  $ scaleInfo :  Scaling Information
+    ##  $ shrink    :  Shrinkage data frame
+    ##  $ table     :  Table Control Value
+    ##  $ fixef     :  Fixed effects
+    ##  $ time      :  Timing data frame
+
+# Output description
 
 ``` r
 # Estimation of DV: PRED and IPRED
@@ -476,11 +559,6 @@ library(ggPMX)
 
 ``` r
 ctr = pmx_nlmixr(fit)
-```
-
-    ## using C compiler: 'gcc.exe (GCC) 12.3.0'
-
-``` r
 pmx_plot_dv_ipred(ctr)
 ```
 

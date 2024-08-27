@@ -80,13 +80,61 @@ ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + them
 
 ## Model
 
+# Compartmental Models
+
+Pharmacokinetics is the study of the time course of a drug and its metabolites following introduction into the body. In this section we describe a class of models that has been extensively used in such studies to model individual drug concentrations, $y(t)$, as a function of the time $t$.
+
+Let $A_i(t)$ represent the amount of drug in compartment $i$, $i=0,1$ at time $t$, with compartment 0 representing the site from which absorption occurs. The differential equations describing the drug flow between the compartments may be assumed to be of the form
+
+$$ \frac{d A_0}{d t} = -k_a A_0
+$$
+
+$$ \frac{d A_1}{d t} = k_a A_0 - k_e A_1
+$$
+
+where $k_a$ is the absorption rate constant associated with flow from compartment 0 to compartment 1, and $k_e$ is the elimination rate constant.
+
+With only one compartment $A_1$, the differential equation for the amount $A_1$ is
+
+$$ \frac{d A_1}{dt } = - k_e A_1 $$
+
+The concentration is 
+
+$$C_p = \frac{A_1(t)}{V(t)}$$
+and considering $V$ as volume, the clearance $ CL $ is defined from
+
+$$k_e = \frac{CL}{V}$$
+
+It is usual to parametrize the model in terms of clearance $CL$ and volume $V$ instead of $k_e$.
+
+The actual fitting parametrization is carried out in term of so called typical values for clearance and volume $tcl$ and $tv$ :
+
+
+$$
+\begin{align}
+  CL =& e^{ tcl + \eta_{CL} }  \\
+  V  =& e^{ tv  + \eta_{V} } 
+\end{align}
+$$
+where $\eta_{CL}$ and $\eta_{V}$ are random variables obeying normal distributions with mean zero and covariance matrix $\Omega$. The components of $\Omega$ are then additional fit parameters. The matrix $\Omega$ and the variables $\eta$ are responsible to explain random inter-individual variability.
+
+$$(\eta_{CL} , \eta_{V}) \approx   N(0, \Omega)  $$
+If $\Omega$ is a diagonal matrix, the inter-individual variabilities are independent. Otherwise, they have some correlation.
+
+The residual error model provides the final random variability on the predicted concentration. The residual error model in this example is
+
+$$C_{obs} = C_p + \varepsilon$$
+
+where $C_{obs}$ is the observed concentration, $C_p$  is the concentration in plasma and $\varepsilon$ is a normal random variable (specified by $add.err=\sigma^2$).
+
+$$ \varepsilon \approx N(0, \sigma^2) $$
+
 ```{r initial}
 pheno <- function() {
   ini({
     tcl <- log(0.008) # typical value of clearance
     tv <-  log(0.6)   # typical value of volume
-    ## var(eta.cl)
-    eta.cl + eta.v ~ c(1, 0.01, 1) ## cov(eta.cl, eta.v), var(eta.v)
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## var(eta.cl), cov(eta.cl, eta.v), var(eta.v)
                       # interindividual variability on clearance and volume
     add.err <- 0.1    # residual variability
   })
@@ -109,11 +157,13 @@ The fit is performed by the function nlmixr/nlmixr2 specifying the model, data a
 ```{r fit}
 fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
 print(fit)
+str(fit)
 
 ```
 
 
-Output description
+# Output description
+
 
 ```{r output}
 
