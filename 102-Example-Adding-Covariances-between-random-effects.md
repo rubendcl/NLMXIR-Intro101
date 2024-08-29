@@ -3,7 +3,7 @@ Basic Example
 Ruben Cabrera
 2024-07-29
 
-## Basic Example
+# Basic Example
 
 Adding Covariances between random effects
 <https://nlmixr2.org/articles/addingCovariances.html>
@@ -130,9 +130,9 @@ ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + them
 
 ![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
 
-## Model
+# Model
 
-# Compartmental Models
+## Compartmental Models
 
 Pharmacokinetics is the study of the time course of a drug and its
 metabolites following introduction into the body. In this section we
@@ -319,8 +319,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup optimize covariance saem table compress
-    ## elapsed 0.002        0       0.02 8.03  2.49     0.12
+    ##         setup optimize covariance  saem table compress
+    ## elapsed 0.006        0       0.03 14.51  5.87     0.18
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -624,3 +624,28 @@ plot(fit)
     ## ℹ Do you need to adjust the group aesthetic?
 
 ![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-71.png)<!-- -->
+
+# Modified Model
+
+We change the fitting parametrization with typical values for clearance
+and volume $tcl$ and $tv$ and also a new variable $WT_{CL}$
+
+$$
+\begin{align}
+  CL =& e^{ tcl + \eta_{CL} } NWT^{WT_{CL}}  \\
+  V  =& e^{ tv  + \eta_{V} } 
+\end{align}
+$$ Where $NWT$ is the weights normalized bye mean $WT$ so:
+
+``` r
+# Calculate mean of 'value' grouped by 'category'
+a<-mean_by_subject <- tapply(pheno_sd$WT, pheno_sd$ID, mean)
+a[1]
+```
+
+    ##   1 
+    ## 1.4
+
+``` r
+pheno_sd$NWE <- pheno_sd$WT - mean(pheno_sd$WT)
+```

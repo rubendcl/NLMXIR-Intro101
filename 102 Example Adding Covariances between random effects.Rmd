@@ -14,7 +14,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Basic Example
+# Basic Example
 
 Adding Covariances between random effects
 https://nlmixr2.org/articles/addingCovariances.html
@@ -78,9 +78,9 @@ ggplot() + pAMT + pDV + facet_wrap_paginate(ID~., ncol=3, nrow=3, page=1) + them
 
 ```
 
-## Model
+# Model
 
-# Compartmental Models
+## Compartmental Models
 
 Pharmacokinetics is the study of the time course of a drug and its metabolites following introduction into the body. In this section we describe a class of models that has been extensively used in such studies to model individual drug concentrations, $y(t)$, as a function of the time $t$.
 
@@ -151,7 +151,6 @@ pheno <- function() {
 ```
 
 
-
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
 ```{r fit}
@@ -215,4 +214,54 @@ Plots
 plot(fit)
 ```
 
+# Modified Model
 
+We change the fitting parametrization with typical values for clearance and volume $tcl$ and $tv$ and also a new variable $WT_{CL}$
+
+
+$$
+\begin{align}
+  CL =& e^{ tcl + \eta_{CL} } NWT^{WT_{CL}}  \\
+  V  =& e^{ tv  + \eta_{V} } 
+\end{align}
+$$
+Where $NWT$ is the weights normalized bye mean $WT$ so:
+
+```{r }
+
+# Calculate mean of 'value' grouped by 'category'
+a<-mean_by_subject <- tapply(pheno_sd$WT, pheno_sd$ID, mean)
+pheno_sd$NWE <- pheno_sd$WT - mean(a)
+```
+
+
+```{r}
+m2 <- function() {
+  ini({
+    tcl <- log(0.008) # typical value of clearance
+    tv <-  log(0.6)   # typical value of volume
+    wt.cl <- 1
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## var(eta.cl), cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
+  })
+  model({
+    cl <- exp(tcl + eta.cl)*NWT^wt.cl  
+    v <- exp(tv + eta.v)     # individual value of volume
+    ke <- cl / v             # elimination rate constant
+    d/dt(A1) = - ke * A1     # model differential equation
+    cp = A1 / v              # concentration in plasma
+    cp ~ add(add.err)        # define error model
+  })
+}
+
+```
+
+The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
+
+```{r}
+fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
+print(fit2)
+str(fit2)
+
+```
