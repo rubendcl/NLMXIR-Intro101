@@ -214,6 +214,24 @@ Plots
 plot(fit)
 ```
 
+```{r}
+plot(augPred(fit))
+```
+```{r}
+p1 <- vpcPlot(fit, show=list(obs_dv=TRUE));
+#> [====|====|====|====|====|====|====|====|====|====] 0:00:00
+p1 <- p1 + ylab("Concentrations")
+
+## A prediction-corrected VPC
+p2 <- vpcPlot(fit, pred_corr = TRUE, show=list(obs_dv=TRUE))
+#> [====|====|====|====|====|====|====|====|====|====] 0:00:00
+p2 <- p2 + ylab("Prediction-Corrected Concentrations")
+
+library(patchwork)
+p1 / p2
+```
+
+
 # Modified Model
 
 We change the fitting parametrization with typical values for clearance and volume $tcl$ and $tv$ and also a new variable $WT_{CL}$
@@ -221,7 +239,7 @@ We change the fitting parametrization with typical values for clearance and volu
 
 $$
 \begin{align}
-  CL =& e^{ tcl + \eta_{CL} } NWT^{WT_{CL}}  \\
+  CL =& e^{ tcl + \eta_{CL} } NWE^{WT_{CL}}  \\
   V  =& e^{ tv  + \eta_{V} } 
 \end{align}
 $$
@@ -229,9 +247,9 @@ Where $NWT$ is the weights normalized bye mean $WT$ so:
 
 ```{r }
 
-# Calculate mean of 'value' grouped by 'category'
-a<-mean_by_subject <- tapply(pheno_sd$WT, pheno_sd$ID, mean)
-pheno_sd$NWE <- pheno_sd$WT - mean(a)
+# Calculate median
+a <- median(distinct(select(pheno_sd,ID,WT))$WT)
+pheno_sd$NWE <- pheno_sd$WT - a
 ```
 
 
@@ -240,13 +258,13 @@ m2 <- function() {
   ini({
     tcl <- log(0.008) # typical value of clearance
     tv <-  log(0.6)   # typical value of volume
-    wt.cl <- 1
+    wt.cl <- 0.75
     eta.cl + eta.v ~ c(1, 0.01, 1) ## var(eta.cl), cov(eta.cl, eta.v), var(eta.v)
                       # interindividual variability on clearance and volume
     add.err <- 0.1    # residual variability
   })
   model({
-    cl <- exp(tcl + eta.cl)*NWT^wt.cl  
+    cl <- exp(tcl + eta.cl)*NWE^wt.cl  
     v <- exp(tv + eta.v)     # individual value of volume
     ke <- cl / v             # elimination rate constant
     d/dt(A1) = - ke * A1     # model differential equation
@@ -260,8 +278,8 @@ m2 <- function() {
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
 ```{r}
-fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
-print(fit2)
-str(fit2)
+##fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
+##print(fit2)
+##str(fit2)
 
 ```

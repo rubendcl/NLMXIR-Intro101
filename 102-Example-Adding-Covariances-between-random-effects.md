@@ -306,7 +306,7 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## → compress parHist in nlmixr2 object, save 7880
 
-    ## → compress saem0 in nlmixr2 object, save 1640
+    ## → compress saem0 in nlmixr2 object, save 1632
 
 ``` r
 print(fit)
@@ -319,8 +319,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup optimize covariance  saem table compress
-    ## elapsed 0.006        0       0.03 14.51  5.87     0.18
+    ##         setup optimize covariance saem table compress
+    ## elapsed 0.004        0       0.03 7.91  2.63     0.11
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -625,6 +625,28 @@ plot(fit)
 
 ![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/plot_fit-71.png)<!-- -->
 
+``` r
+plot(augPred(fit))
+```
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
+
+``` r
+p1 <- vpcPlot(fit, show=list(obs_dv=TRUE));
+#> [====|====|====|====|====|====|====|====|====|====] 0:00:00
+p1 <- p1 + ylab("Concentrations")
+
+## A prediction-corrected VPC
+p2 <- vpcPlot(fit, pred_corr = TRUE, show=list(obs_dv=TRUE))
+#> [====|====|====|====|====|====|====|====|====|====] 0:00:00
+p2 <- p2 + ylab("Prediction-Corrected Concentrations")
+
+library(patchwork)
+p1 / p2
+```
+
+![](102-Example-Adding-Covariances-between-random-effects_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
 # Modified Model
 
 We change the fitting parametrization with typical values for clearance
@@ -632,20 +654,43 @@ and volume $tcl$ and $tv$ and also a new variable $WT_{CL}$
 
 $$
 \begin{align}
-  CL =& e^{ tcl + \eta_{CL} } NWT^{WT_{CL}}  \\
+  CL =& e^{ tcl + \eta_{CL} } NWE^{WT_{CL}}  \\
   V  =& e^{ tv  + \eta_{V} } 
 \end{align}
 $$ Where $NWT$ is the weights normalized bye mean $WT$ so:
 
 ``` r
-# Calculate mean of 'value' grouped by 'category'
-a<-mean_by_subject <- tapply(pheno_sd$WT, pheno_sd$ID, mean)
-a[1]
+# Calculate median
+a <- median(distinct(select(pheno_sd,ID,WT))$WT)
+pheno_sd$NWE <- pheno_sd$WT - a
 ```
 
-    ##   1 
-    ## 1.4
+``` r
+m2 <- function() {
+  ini({
+    tcl <- log(0.008) # typical value of clearance
+    tv <-  log(0.6)   # typical value of volume
+    wt.cl <- 0.75
+    eta.cl + eta.v ~ c(1, 0.01, 1) ## var(eta.cl), cov(eta.cl, eta.v), var(eta.v)
+                      # interindividual variability on clearance and volume
+    add.err <- 0.1    # residual variability
+  })
+  model({
+    cl <- exp(tcl + eta.cl)*NWE^wt.cl  
+    v <- exp(tv + eta.v)     # individual value of volume
+    ke <- cl / v             # elimination rate constant
+    d/dt(A1) = - ke * A1     # model differential equation
+    cp = A1 / v              # concentration in plasma
+    cp ~ add(add.err)        # define error model
+  })
+}
+```
+
+The fit is performed by the function nlmixr/nlmixr2 specifying the
+model, data and estimate
 
 ``` r
-pheno_sd$NWE <- pheno_sd$WT - mean(pheno_sd$WT)
+##fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
+##print(fit2)
+##str(fit2)
 ```
