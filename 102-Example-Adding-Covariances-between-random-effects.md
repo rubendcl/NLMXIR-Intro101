@@ -155,6 +155,8 @@ where $k_a$ is the absorption rate constant associated with flow from
 compartment 0 to compartment 1, and $k_e$ is the elimination rate
 constant.
 
+## One Compartment
+
 With only one compartment $A_1$, the differential equation for the
 amount $A_1$ is
 
@@ -306,7 +308,7 @@ fit <- nlmixr(pheno, pheno_sd, "saem", control=list(print=0), table=list(cwres=T
 
     ## → compress parHist in nlmixr2 object, save 7880
 
-    ## → compress saem0 in nlmixr2 object, save 1632
+    ## → compress saem0 in nlmixr2 object, save 1640
 
 ``` r
 print(fit)
@@ -320,7 +322,7 @@ print(fit)
     ## ── Time (sec $time): ──
     ## 
     ##         setup optimize covariance saem table compress
-    ## elapsed 0.004        0       0.03 7.91  2.63     0.11
+    ## elapsed 0.002        0          0 7.73  2.47      0.1
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 
@@ -662,7 +664,7 @@ $$ Where $NWT$ is the weights normalized bye mean $WT$ so:
 ``` r
 # Calculate median
 a <- median(distinct(select(pheno_sd,ID,WT))$WT)
-pheno_sd$NWE <- pheno_sd$WT - a
+pheno_sd$NWE <- pheno_sd$WT / a
 ```
 
 ``` r
@@ -690,7 +692,194 @@ The fit is performed by the function nlmixr/nlmixr2 specifying the
 model, data and estimate
 
 ``` r
-##fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
-##print(fit2)
-##str(fit2)
+fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
 ```
+
+    ## ℹ parameter labels from comments will be replaced by 'label()'
+
+    ## → loading into symengine environment...
+
+    ## → pruning branches (`if`/`else`) of saem model...
+
+    ## ✔ done
+
+    ## → finding duplicate expressions in saem model...
+
+    ## ✔ done
+
+    ## Calculating covariance matrix
+
+    ## → loading into symengine environment...
+
+    ## → pruning branches (`if`/`else`) of saem model...
+
+    ## ✔ done
+
+    ## → finding duplicate expressions in saem predOnly model 0...
+
+    ## → finding duplicate expressions in saem predOnly model 1...
+
+    ## → finding duplicate expressions in saem predOnly model 2...
+
+    ## → optimizing duplicate expressions in saem predOnly model 2...
+
+    ## ✔ done
+
+    ## → Calculating residuals/tables
+
+    ## → loading into symengine environment...
+
+    ## → pruning branches (`if`/`else`) of full model...
+
+    ## ✔ done
+
+    ## → calculate jacobian
+
+    ## → calculate sensitivities
+
+    ## → calculate ∂(f)/∂(η)
+
+    ## → calculate ∂(R²)/∂(η)
+
+    ## → finding duplicate expressions in inner model...
+
+    ## → optimizing duplicate expressions in inner model...
+
+    ## → finding duplicate expressions in EBE model...
+
+    ## → optimizing duplicate expressions in EBE model...
+
+    ## → compiling inner model...
+
+    ## ✔ done
+
+    ## → finding duplicate expressions in FD model...
+
+    ## → optimizing duplicate expressions in FD model...
+
+    ## → compiling EBE model...
+
+    ## ✔ done
+
+    ## → compiling events FD model...
+
+    ## ✔ done
+    ## ✔ done
+
+    ## → compress origData in nlmixr2 object, save 38744
+
+    ## → compress phiM in nlmixr2 object, save 380168
+
+    ## → compress parHist in nlmixr2 object, save 9264
+
+``` r
+print(fit2)
+```
+
+    ## ── nlmixr² SAEM OBJF by FOCEi approximation ──
+    ## 
+    ##           OBJF      AIC      BIC Log-likelihood Condition#(Cov) Condition#(Cor)
+    ## FOCEi 673.3354 972.2064 993.5103      -479.1032        7.562976        2.050596
+    ## 
+    ## ── Time (sec $time): ──
+    ## 
+    ##         setup optimize covariance  saem table compress
+    ## elapsed 0.014        0       0.01 38.24  3.49     0.09
+    ## 
+    ## ── Population Parameters ($parFixed or $parFixedDf): ──
+    ## 
+    ##                          Parameter  Est.     SE  %RSE   Back-transformed(95%CI)
+    ## tcl     typical value of clearance -5.12 0.0455 0.887 0.00595 (0.00544, 0.0065)
+    ## tv         typical value of volume 0.346 0.0545  15.8         1.41 (1.27, 1.57)
+    ## wt.cl                               1.22  0.115  9.38        1.22 (0.996, 1.44)
+    ## add.err       residual variability  2.91                                   2.91
+    ##         BSV(CV%) Shrink(SD)%
+    ## tcl         14.9      46.8% 
+    ## tv          41.4      2.96% 
+    ## wt.cl                       
+    ## add.err                     
+    ##  
+    ##   Covariance Type ($covMethod): linFim
+    ##   Correlations in between subject variability (BSV) matrix:
+    ##     cor:eta.v,eta.cl 
+    ##           0.171  
+    ##  
+    ## 
+    ##   Full BSV covariance ($omega) or correlation ($omegaR; diagonals=SDs) 
+    ##   Distribution stats (mean/skewness/kurtosis/p-value) available in $shrink 
+    ##   Censoring ($censInformation): No censoring
+    ## 
+    ## ── Fit Data (object is a modified tibble): ──
+    ## # A tibble: 155 × 27
+    ##   ID     TIME    DV EPRED  ERES   NPDE    NPD    PDE    PD  PRED    RES    WRES
+    ##   <fct> <dbl> <dbl> <dbl> <dbl>  <dbl>  <dbl>  <dbl> <dbl> <dbl>  <dbl>   <dbl>
+    ## 1 1        2   17.3  19.2 -1.90 -0.830 -0.117 0.203  0.453  17.5 -0.225 -0.0300
+    ## 2 1      112.  31    28.7  2.32  0.403  0.403 0.657  0.657  28.3  2.74   0.326 
+    ## 3 2        2    9.7  11.3 -1.56 -1.61  -0.176 0.0533 0.43   10.5 -0.806 -0.159 
+    ## # ℹ 152 more rows
+    ## # ℹ 15 more variables: IPRED <dbl>, IRES <dbl>, IWRES <dbl>, CPRED <dbl>,
+    ## #   CRES <dbl>, CWRES <dbl>, eta.cl <dbl>, eta.v <dbl>, A1 <dbl>, cl <dbl>,
+    ## #   v <dbl>, ke <dbl>, tad <dbl>, dosenum <dbl>, NWE <dbl>
+
+``` r
+str(fit2)
+```
+
+    ## nlmxr2FD [155 × 27] (S3: nlmixr2FitData/nlmixr2FitCore/nlmixr2.saem/tbl_df/tbl/data.frame)
+    ##  $ ID     : Factor w/ 59 levels "1","2","3","4",..: 1 1 2 2 2 3 3 3 4 4 ...
+    ##  $ TIME   : num [1:155] 2 112.5 2 63.5 135.5 ...
+    ##  $ DV     : num [1:155] 17.3 31 9.7 24.6 33 18 23.8 24.3 20.8 23.9 ...
+    ##  $ EPRED  : num [1:155] 19.2 28.7 11.3 19.4 25.9 ...
+    ##  $ ERES   : num [1:155] -1.9 2.32 -1.56 5.15 7.1 ...
+    ##  $ NPDE   : num [1:155] -0.82977 0.40338 -1.61336 -0.00836 1.05084 ...
+    ##  $ NPD    : num [1:155] -0.117 0.403 -0.176 0.83 1.051 ...
+    ##  $ PDE    : num [1:155] 0.2033 0.6567 0.0533 0.4967 0.8533 ...
+    ##  $ PD     : num [1:155] 0.453 0.657 0.43 0.797 0.853 ...
+    ##  $ PRED   : num [1:155] 17.5 28.3 10.5 19 26.4 ...
+    ##  $ RES    : num [1:155] -0.225 2.742 -0.806 5.591 6.579 ...
+    ##  $ WRES   : num [1:155] -0.03 0.326 -0.159 0.842 0.889 ...
+    ##  $ IPRED  : num [1:155] 18.4 29.4 13.2 23.1 31.5 ...
+    ##  $ IRES   : num [1:155] -1.07 1.56 -3.48 1.46 1.54 ...
+    ##  $ IWRES  : num [1:155] -0.368 0.536 -1.196 0.501 0.528 ...
+    ##  $ CPRED  : num [1:155] 17.5 28.2 10.2 18.6 26.1 ...
+    ##  $ CRES   : num [1:155] -0.205 2.765 -0.493 5.965 6.937 ...
+    ##  $ CWRES  : num [1:155] -0.0262 0.319 -0.0828 0.785 0.85 ...
+    ##  $ eta.cl : num [1:155] -0.0284 -0.0284 -0.1002 -0.1002 -0.1002 ...
+    ##  $ eta.v  : num [1:155] -0.0473 -0.0473 -0.2282 -0.2282 -0.2282 ...
+    ##  $ A1     : num [1:155] 24.8 39.7 14.8 26 35.4 ...
+    ##  $ cl     : num [1:155] 0.00633 0.00633 0.00641 0.00641 0.00641 ...
+    ##  $ v      : num [1:155] 1.35 1.35 1.13 1.13 1.13 ...
+    ##  $ ke     : num [1:155] 0.00469 0.00469 0.0057 0.0057 0.0057 ...
+    ##  $ tad    : num [1:155] 2 4 2 11.5 11.5 ...
+    ##  $ dosenum: num [1:155] 1 10 1 6 12 1 7 12 1 5 ...
+    ##  $ NWE    : num [1:155] 1.08 1.08 1.15 1.15 1.15 ...
+    ##  $ cor       :  correlation matrix of theta, calculated from covariance of theta
+    ##  $ finalUi   :  The final ui used to run the model
+    ##  $ foceiControl:  Get the focei control required for creating the nlmixr object
+    ##  $ iniUi     :  The initial ui used to run the model
+    ##  $ ipredModel:  rxode2 estimation model for fit
+    ##  $ modelName :  name of the model used for nlmixr2 model fit
+    ##  $ omegaR    :  correlation matrix of omega
+    ##  $ parHistStacked:  stacked parameter history
+    ##  $ phiR      :  correlation matrix of each individual's eta (if present)
+    ##  $ phiRSE    :  relative standard error of each individual's eta (if present)
+    ##  $ phiSE     :  standard error of each individual's eta (if present)
+    ##  $ rxControl :  rxode2 solving options
+    ##  $ ui        :  The final ui used to run the model
+    ##  $ ui        :  rxode2 user interface
+    ##  $ conditionNumberCor:  Condition Number (Correlation)
+    ##  $ conditionNumberCov:  Condition Number (Covariance)
+    ##  $ cov       :  Covariance of fixed effects
+    ##  $ covMethod :  Covariance Method for fixed effects
+    ##  $ etaObf    :  ETAs and their individual objective function contribution (if applicable)
+    ##  $ objDf     :  Objective Function DF
+    ##  $ omega     :  Omega Matrix
+    ##  $ origData  :  Original Data
+    ##  $ parFixed  :  Formatted Parameter Values for Fixed effects
+    ##  $ parFixedDf:  Parameter Values for Fixed Effects (data frame)
+    ##  $ parHist   :  Parameter History
+    ##  $ scaleInfo :  Scaling Information
+    ##  $ shrink    :  Shrinkage data frame
+    ##  $ table     :  Table Control Value
+    ##  $ fixef     :  Fixed effects
+    ##  $ time      :  Timing data frame

@@ -1,7 +1,7 @@
 Basic Example
 ================
 Ruben Cabrera
-2023-07-24
+2024-07-24
 
 ## Basic Example
 
@@ -179,7 +179,7 @@ fit <- nlmixr2(one.compartment, theo_sd,  est="saem", saemControl(print=0))
 
     ## → compress parHist in nlmixr2 object, save 9760
 
-    ## → compress saem0 in nlmixr2 object, save 29008
+    ## → compress saem0 in nlmixr2 object, save 29000
 
 ``` r
 print(fit)
@@ -192,8 +192,8 @@ print(fit)
     ## 
     ## ── Time (sec $time): ──
     ## 
-    ##         setup covariance  saem table compress other
-    ## elapsed 0.006       0.01 12.99  0.18     0.17 9.504
+    ##         setup covariance saem table compress other
+    ## elapsed 0.003       0.02 6.78  0.08     0.11 4.067
     ## 
     ## ── Population Parameters ($parFixed or $parFixedDf): ──
     ## 

@@ -5,6 +5,8 @@ date: "2024-07-29"
 output: 
   github_document: default
   html_document: default
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_format = "all") })
 # always_allow_html: true
 # devtools::install_github("kupietz/kableExtra")
 # install.packages("xfun", repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
@@ -93,6 +95,8 @@ $$ \frac{d A_1}{d t} = k_a A_0 - k_e A_1
 $$
 
 where $k_a$ is the absorption rate constant associated with flow from compartment 0 to compartment 1, and $k_e$ is the elimination rate constant.
+
+## One Compartment
 
 With only one compartment $A_1$, the differential equation for the amount $A_1$ is
 
@@ -249,7 +253,7 @@ Where $NWT$ is the weights normalized bye mean $WT$ so:
 
 # Calculate median
 a <- median(distinct(select(pheno_sd,ID,WT))$WT)
-pheno_sd$NWE <- pheno_sd$WT - a
+pheno_sd$NWE <- pheno_sd$WT / a
 ```
 
 
@@ -278,8 +282,8 @@ m2 <- function() {
 The fit is performed by the function nlmixr/nlmixr2 specifying the model, data and estimate
 
 ```{r}
-##fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
-##print(fit2)
-##str(fit2)
+fit2 <- nlmixr(m2, pheno_sd, "saem", control=list(print=0), table=list(cwres=TRUE, npde=TRUE))
+print(fit2)
+str(fit2)
 
 ```

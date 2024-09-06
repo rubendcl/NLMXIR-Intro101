@@ -5,6 +5,9 @@ date: "2024-07-24"
 output: 
   github_document: default
   html_document: default
+knit: (function(inputFile, encoding) {
+  rmarkdown::render(inputFile, encoding = encoding, output_format = "all") })
+# always_allow_html: true
 # always_allow_html: true
 # devtools::install_github("kupietz/kableExtra")
 # install.packages("xfun", repos=c("http://rstudio.org/_packages", "http://cran.rstudio.com"))
